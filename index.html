@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII⇔16進数変換アプリ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .converter-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .converter-section h2 {
+            margin-top: 0;
+            color: #555;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #007acc;
+            box-shadow: 0 0 5px rgba(0,122,204,0.3);
+        }
+        
+        .button-group {
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #005999;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .clear-btn {
+            background-color: #dc3545;
+        }
+        
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .error {
+            background-color: #ffe7e7;
+            border: 1px solid #ffb3b3;
+            color: #d8000c;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ASCII⇔16進数変換アプリ</h1>
+        
+        <div class="converter-section">
+            <h2>ASCII → 16進数</h2>
+            <label for="asciiInput">ASCII文字を入力してください:</label>
+            <textarea id="asciiInput" placeholder="例: Hello World!"></textarea>
+            <div class="button-group">
+                <button onclick="convertToHex()">16進数に変換</button>
+                <button class="clear-btn" onclick="clearAsciiInput()">クリア</button>
+            </div>
+            <label for="hexOutput">16進数出力:</label>
+            <textarea id="hexOutput" readonly placeholder="変換結果がここに表示されます"></textarea>
+        </div>
+        
+        <div class="converter-section">
+            <h2>16進数 → ASCII</h2>
+            <label for="hexInput">16進数を入力してください（スペース区切り可）:</label>
+            <textarea id="hexInput" placeholder="例: 48 65 6C 6C 6F 20 57 6F 72 6C 64 21"></textarea>
+            <div class="button-group">
+                <button onclick="convertToAscii()">ASCII文字に変換</button>
+                <button class="clear-btn" onclick="clearHexInput()">クリア</button>
+            </div>
+            <label for="asciiOutput">ASCII文字出力:</label>
+            <textarea id="asciiOutput" readonly placeholder="変換結果がここに表示されます"></textarea>
+        </div>
+        
+        <div class="info">
+            <strong>使い方:</strong><br>
+            • ASCII文字を16進数に変換: 上部にテキストを入力し「16進数に変換」ボタンを押してください<br>
+            • 16進数をASCII文字に変換: 下部に16進数を入力し「ASCII文字に変換」ボタンを押してください<br>
+            • 16進数はスペース区切りまたは連続で入力可能です（例: "48656C6C6F" または "48 65 6C 6C 6F"）
+        </div>
+    </div>
+
+    <script>
+        /// <reference lib="dom" />
+        
+        // ASCII文字を16進数に変換する関数
+        function convertToHex() {
+            const asciiInput = document.getElementById('asciiInput');
+            const hexOutput = document.getElementById('hexOutput');
+            
+            try {
+                const text = asciiInput.value;
+                if (!text) {
+                    hexOutput.value = '';
+                    return;
+                }
+                
+                let hexString = '';
+                for (let i = 0; i < text.length; i++) {
+                    const charCode = text.charCodeAt(i);
+                    const hex = charCode.toString(16).toUpperCase().padStart(2, '0');
+                    hexString += hex + ' ';
+                }
+                
+                hexOutput.value = hexString.trim();
+                
+                // 成功時の視覚フィードバック
+                hexOutput.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    hexOutput.style.backgroundColor = '';
+                }, 1000);
+                
+            } catch (error) {
+                hexOutput.value = 'エラー: 変換に失敗しました';
+                console.error('ASCII→16進数変換エラー:', error);
+            }
+        }
+        
+        // 16進数をASCII文字に変換する関数
+        function convertToAscii() {
+            const hexInput = document.getElementById('hexInput');
+            const asciiOutput = document.getElementById('asciiOutput');
+            
+            try {
+                let hexString = hexInput.value.trim();
+                if (!hexString) {
+                    asciiOutput.value = '';
+                    return;
+                }
+                
+                // スペースや改行を除去
+                hexString = hexString.replace(/\s+/g, '');
+                
+                // 16進数文字のみかチェック
+                if (!/^[0-9A-Fa-f]*$/.test(hexString)) {
+                    throw new Error('無効な16進数文字が含まれています');
+                }
+                
+                // 偶数桁でない場合はエラー
+                if (hexString.length % 2 !== 0) {
+                    throw new Error('16進数の桁数が偶数ではありません');
+                }
+                
+                let asciiString = '';
+                for (let i = 0; i < hexString.length; i += 2) {
+                    const hexPair = hexString.substr(i, 2);
+                    const charCode = parseInt(hexPair, 16);
+                    
+                    // ASCII範囲チェック (0-127)
+                    if (charCode > 127) {
+                        console.warn(`非ASCII文字: ${charCode} (0x${hexPair})`);
+                    }
+                    
+                    asciiString += String.fromCharCode(charCode);
+                }
+                
+                asciiOutput.value = asciiString;
+                
+                // 成功時の視覚フィードバック
+                asciiOutput.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    asciiOutput.style.backgroundColor = '';
+                }, 1000);
+                
+            } catch (error) {
+                asciiOutput.value = `エラー: ${error.message}`;
+                console.error('16進数→ASCII変換エラー:', error);
+                
+                // エラー時の視覚フィードバック
+                asciiOutput.style.backgroundColor = '#ffe8e8';
+                setTimeout(() => {
+                    asciiOutput.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+        
+        // クリア機能
+        function clearAsciiInput() {
+            document.getElementById('asciiInput').value = '';
+            document.getElementById('hexOutput').value = '';
+        }
+        
+        function clearHexInput() {
+            document.getElementById('hexInput').value = '';
+            document.getElementById('asciiOutput').value = '';
+        }
+        
+        // リアルタイム変換のイベントリスナー（オプション）
+        document.getElementById('asciiInput')?.addEventListener('input', function() {
+            // 自動変換を有効にしたい場合はコメントアウトを外してください
+            // convertToHex();
+        });
+        
+        document.getElementById('hexInput')?.addEventListener('input', function() {
+            // 自動変換を有効にしたい場合はコメントアウトを外してください  
+            // convertToAscii();
+        });
+        
+        // エンターキーでの変換
+        document.getElementById('asciiInput')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                convertToHex();
+                e.preventDefault();
+            }
+        });
+        
+        document.getElementById('hexInput')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                convertToAscii();
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
